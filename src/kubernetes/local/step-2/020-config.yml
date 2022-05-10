@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-api-config
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: frontend
+data:
+  api.Url: |
+    { "url": "http://api.localgft.com/thermometer/" }

@@ -1,0 +1,11 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: com-gft-deuba-unity-gitops-1
+  labels: 
+    PROJECT: com.gft.deuba.unity.gitops-1
+    config.istio.io/admission-webhooks: enabled
+    istio-injection: enabled

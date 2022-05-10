@@ -1,0 +1,30 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: frontend
+    version: "1.0.0"
+spec:
+  containers:
+    - name: frontend
+      image: com.gft.deuba.unity.gitops-1.frontend.fe-weatherstation:v1
+      imagePullPolicy: Never
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      volumeMounts:
+      - name: config
+        mountPath: "/usr/share/nginx/html/assets/config.json"
+        readOnly: true
+        subPath: api.Url
+  volumes:
+    - name: config
+      configMap:
+        name: frontend-api-config

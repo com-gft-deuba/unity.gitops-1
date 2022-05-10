@@ -1,0 +1,107 @@
+version: "3.9"
+
+networks:
+  com.gft.deuba.unity.gitops-1:
+
+services:
+
+  fe-weatherstation:
+    image: com.gft.deuba.unity.gitops-1.frontend.fe-weatherstation:with-content
+    links:
+      - frontend-v1
+    ports:
+      - "30080:80"
+    networks:
+      - com.gft.deuba.unity.gitops-1
+    deploy:
+      replicas: 1
+      labels:
+        - COMPONENT=fe-weatherstation
+        - MODULE=frontend
+        - PROJECT=com.gft.deuba.unity.gitops-1
+        - CUSTOMER=com.gft.deuba
+        - VERSION=1.0.0
+# 
+#   fe-measure:
+#     image: com.gft.deuba.unity.gitops-1.frontend.fe-measure:v1
+#     command: [ "--device", "http://thermometer:8080/measure", "--name", "fe-measure" ]
+#     links:
+#       - frontend_old-v1
+#     ports:
+#       - "30083:8080"
+#     networks:
+#       - com.gft.deuba.unity.gitops-1
+#     deploy:
+#       replicas: 1
+#       labels:
+#         - COMPONENT=fe-measure
+#         - MODULE=frontend
+#         - PROJECT=com.gft.deuba.unity.gitops-1
+#         - CUSTOMER=com.gft.deuba
+#         - VERSION=1.0.0
+
+  thermometer-vi:
+    image: com.gft.deuba.unity.gitops-1.application.ms-measure:v1
+    command: [ "--name", "thermometer", "--type", "thermometer", "--address", "01:00", "--randomsvc", "http://random-v1:8080/random" ]
+    ports:
+      - "30081:8080"
+    networks:
+      com.gft.deuba.unity.gitops-1:
+        aliases:
+          - thermometer
+    deploy:
+      replicas: 1
+      labels:
+        - COMPONENT=ms-measure
+        - MODULE=application
+        - PROJECT=com.gft.deuba.unity.gitops-1
+        - CUSTOMER=com.gft.deuba
+        - VERSION=1.0.0
+
+  thermometer-v2:
+    image: com.gft.deuba.unity.gitops-1.application.ms-measure:v2
+    command: [ "--name", "thermometer", "--type", "thermometer", "--address", "02:00", "--randomsvc", "http://random-v2:8080/random" ]
+    ports:
+      - "30084:8080"
+    networks:
+      - com.gft.deuba.unity.gitops-1
+    deploy:
+      replicas: 1
+      labels:
+        - COMPONENT=ms-measure
+        - MODULE=application
+        - PROJECT=com.gft.deuba.unity.gitops-1
+        - CUSTOMER=com.gft.deuba
+        - VERSION=2.0.0
+
+  random-v1:
+    image: com.gft.deuba.unity.gitops-1.backend.ms-random:v1
+    command: [ "--name", "random" ]
+    ports:
+      - "30082:8080"
+    networks:
+      - com.gft.deuba.unity.gitops-1
+    deploy:
+      replicas: 1
+      labels:
+        - COMPONENT=ms-random
+        - MODULE=backend
+        - PROJECT=com.gft.deuba.unity.gitops-1
+        - CUSTOMER=com.gft.deuba
+        - VERSION=1.0.0
+
+  random-v2:
+    image: com.gft.deuba.unity.gitops-1.backend.ms-random:v2
+    command: [ "--name", "random" ]
+    ports:
+      - "30085:8080"
+    networks:
+      - com.gft.deuba.unity.gitops-1
+    deploy:
+      replicas: 1
+      labels:
+        - COMPONENT=ms-random
+        - MODULE=backend
+        - PROJECT=com.gft.deuba.unity.gitops-1
+        - CUSTOMER=com.gft.deuba
+        - VERSION=2.0.0

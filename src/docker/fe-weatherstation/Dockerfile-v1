@@ -1,0 +1,48 @@
+# build Angular application
+FROM node:14-alpine AS builder
+COPY src/angular/fe-weatherstation /opt/fe-weatherstation/
+WORKDIR /opt/fe-weatherstation
+
+RUN npm install -g @angular/cli@13.0.3
+RUN npm install
+
+ARG VARIANT
+ENV VARIANT=$VARIANT
+
+RUN ng build --base-href=./ # --configuration $VARIANT
+# RUN sed -i 's%base *href="[^"]*"%base href="/frontend"%g' src/index.html # "
+# RUN ng build --configuration $VARIANT
+
+
+# Create Nginx container with the Angular application
+FROM nginx:stable-alpine
+ARG GITHASH
+ARG TIMESTAMP
+ARG COMPONENT
+ARG MODULE
+ARG CUSTOMER
+ARG PROJECT
+ARG VARIANT
+
+COPY --from=builder /opt/fe-weatherstation/dist/weatherstation-fe /usr/share/nginx/html
+COPY src/docker/fe-weatherstation/app.conf /etc/nginx/conf.d
+RUN chown root:root /etc/nginx/conf.d/app.conf && \
+    chmod 0644      /etc/nginx/conf.d/app.conf
+
+ENV GITHASH=$GITHASH
+ENV TIMESTAMP=$TIMESTAMP
+ENV COMPONENT=$COMPONENT
+ENV MODULE=$MODULE
+ENV CUSTOMER=$CUSTOMER
+ENV PROJECT=$PROJECT
+ENV VERSION=1.0.0
+ENV VARIANT=$VARIANT
+
+LABEL GITHASH=${GITHASH}
+LABEL TIMESTAMP=${TIMESTAMP}
+LABEL COMPONENT=${COMPONENT}
+LABEL MODULE=${MODULE}
+LABEL CUSTOMER=${CUSTOMER}
+LABEL PROJECT=${PROJECT}
+LABEL VERSION=1.0.0
+LABEL VARIANT=$VARIANT

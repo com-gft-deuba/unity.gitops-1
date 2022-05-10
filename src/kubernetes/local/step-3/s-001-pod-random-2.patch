@@ -1,0 +1,25 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: random-2
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: random
+    version: "2.0.0"
+
+spec:
+
+  containers:
+    - name: random-2
+      image: com.gft.deuba.unity.gitops-1.backend.ms-random:v2
+      imagePullPolicy: Never
+      args: [ "--name", "random-2" ]
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+

@@ -1,0 +1,64 @@
+FROM gitea/gitea:latest
+
+ARG GITHASH
+ARG TIMESTAMP
+ARG COMPONENT
+ARG MODULE
+ARG CUSTOMER
+ARG PROJECT
+
+ENV GITHASH=$GITHASH
+ENV TIMESTAMP=$TIMESTAMP
+ENV COMPONENT=$COMPONENT
+ENV MODULE=$MODULE
+ENV CUSTOMER=$CUSTOMER
+ENV PROJECT=$PROJECT
+
+USER root
+
+RUN mkdir -p /tmp/gitea/secret /tmp/gitea/repo /tmp/gitea/scripts&& \
+    mkdir -p /data/gitea/conf  
+
+COPY files/app.ini /data/gitea/conf/app.ini
+COPY files/gitops.id_rsa /tmp/gitea/secret/
+COPY files/gitops.id_rsa.pub /tmp/gitea/secret/
+COPY scripts /tmp/gitea/scripts
+
+RUN chmod -R a+rwX /tmp/gitea && \
+    chmod -R a+rwx /tmp/gitea/scripts && \
+    chown -R git   /tmp/gitea && \
+    chown -R git:git /data
+
+USER git
+
+RUN set -o pipefail && \
+    gitea migrate && \
+    ( gitea admin user create --admin --username gitea --password gitea --access-token --email gitea@noreply.localhost --must-change-password=false | sed -n 's/^Access token was successfully created... *//p' > /tmp/gitea/secret/access_token.gitea) && \
+    ( gitea admin user create         --username gitops --password gitops --access-token --email gitops@noreply.localhost --must-change-password=false | sed -n 's/^Access token was successfully created... *//p' > /tmp/gitea/secret/access_token.gitops )
+
+USER root
+RUN git clone --mirror https://github.com/com-gft-tsbo-source/go-ms-random.git /tmp/gitea/repo/go-ms-random.git && \
+    git clone --mirror https://github.com/com-gft-tsbo-source/go-ms-measure.git /tmp/gitea/repo/go-ms-measure.git && \
+    git clone --mirror https://github.com/com-gft-tsbo-source/go-common.git /tmp/gitea/repo/go-common.git && \
+    git clone --mirror https://github.com/com-gft-tsbo-source/angular-fe-weatherstation.git /tmp/gitea/repo/angular-fe-weatherstation.git
+
+RUN /bin/s6-svscan /etc/s6 & \
+    sleep 5 && \
+    /tmp/gitea/scripts/wait_for_up.sh && \
+    /tmp/gitea/scripts/configure_users.sh && \
+    /tmp/gitea/scripts/configure_repos.sh && \
+    /tmp/gitea/scripts/configure_webhooks.sh && \
+    sleep 5
+ 
+RUN chown -R git   /tmp/gitea
+
+USER root
+
+LABEL GITHASH=${GITHASH}
+LABEL TIMESTAMP=${TIMESTAMP}
+LABEL COMPONENT=${COMPONENT}
+LABEL MODULE=${MODULE}
+LABEL CUSTOMER=${CUSTOMER}
+LABEL PROJECT=${PROJECT}
+
+

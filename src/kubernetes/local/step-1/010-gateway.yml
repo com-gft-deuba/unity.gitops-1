@@ -1,0 +1,144 @@
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: app-ingress-gateway
+  namespace: com-gft-deuba-unity-gitops-1
+  labels: 
+    PROJECT: com.gft.deuba.unity.gitops-1
+
+spec:
+
+  selector:
+    istio: ingressgateway
+
+  servers:
+
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+
+    hosts:
+
+    - "*"
+
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend-ingress
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: frontend
+
+spec:
+
+  hosts:
+
+    - api.localgft.com
+    - prod.localgft.com
+    - pilot.localgft.com
+    - dev.localgft.com
+
+  gateways:
+
+    - app-ingress-gateway
+
+  http:
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer
+
+      match:
+
+      - uri:
+          prefix: /thermometer/
+
+      rewrite:
+        uri: /
+
+      route:
+        - destination:
+            host: thermometer
+
+    - name: random
+
+      match:
+
+      - uri:
+          prefix: /random/
+
+      rewrite:
+        uri: /
+
+      route:
+        - destination:
+            host: random
+
+    - name: frontend
+
+      match:
+
+      - uri:
+          prefix: /frontend/
+
+      rewrite:
+        uri: /
+
+      route:
+        - destination:
+            host: frontend
+
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: infrastructure-ingress
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: infrastructure
+
+spec:
+
+  hosts:
+
+    - dev.localgft.com
+
+  gateways:
+
+    - app-ingress-gateway
+
+  http:
+
+    - name: gitea
+
+      match:
+
+      - uri:
+          prefix: /gitea/
+
+      - uri:
+          prefix: /gitea
+
+      rewrite:
+        uri: /
+
+      route:
+        - destination:
+            host: gitea
+
+      headers:
+        request:
+          set:
+            x-forwarded-for: dev.localgft.com
+

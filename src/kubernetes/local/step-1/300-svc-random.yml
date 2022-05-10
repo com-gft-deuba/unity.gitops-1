@@ -1,0 +1,23 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: random
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: random
+
+spec:
+
+  selector:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: random
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      appProtocol: http
+      name: http-endpoint

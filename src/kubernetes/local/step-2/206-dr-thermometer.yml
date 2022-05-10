@@ -1,0 +1,26 @@
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: thermometer-destination
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: thermometer
+    version: "1.0.0"
+
+spec:
+
+  host: thermometer
+  
+  subsets:
+
+  - name: prod
+    labels:
+      version: "1.0.0"
+
+  - name: pre-prod
+    labels:
+      version: "1.0.0"

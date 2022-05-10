@@ -1,0 +1,173 @@
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thermometer-ingress-api
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: thermometer
+    version: "1.0.0"
+
+spec:
+
+  hosts:
+
+    - "api.localgft.com"
+
+  gateways:
+
+    - app-ingress-gateway
+
+  http:
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer-pre-prod
+
+      match:
+
+      - uri:
+          prefix: /thermometer/
+
+        headers:
+          origin:
+            regex: .*pilot.localgft.com.*
+
+      - uri:
+          prefix: /thermometer/
+
+        headers:
+          x-environment: 
+            exact: pre-prod
+
+      rewrite:
+        uri: /
+
+      headers:
+        request:
+          set:
+            x-environment: pre-prod
+
+        response:
+          set:
+            x-environment: pre-prod
+
+      route:
+        - destination:
+            host: thermometer
+            subset: pre-prod
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer-prod
+
+      match:
+
+      - uri:
+          prefix: /thermometer/
+
+        headers:
+          origin:
+            regex: .*prod.localgft.com.*
+
+      - uri:
+          prefix: /thermometer/
+
+        headers:
+          x-environment: 
+            exact: prod
+
+      rewrite:
+        uri: /
+
+      headers:
+        request:
+          set:
+            x-environment: prod
+
+        response:
+          set:
+            x-environment: prod
+
+      route:
+        - destination:
+            host: thermometer
+            subset: prod
+
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thermometer-int-api
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: thermometer
+    version: "1.0.0"
+
+spec:
+
+  hosts:
+
+    - "thermometer"
+
+  http:
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer-pre-prod
+
+      match:
+
+      - headers:
+          origin:
+            regex: .*pilot.localgft.com.*
+
+      - headers:
+          x-environment: 
+            exact: pre-prod
+
+      rewrite:
+        uri: /
+
+      headers:
+        request:
+          set:
+            x-environment: pre-prod
+
+      route:
+        - destination:
+            host: thermometer
+            subset: pre-prod
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer-prod
+
+      match:
+
+      - headers:
+          origin:
+            regex: .*prod.localgft.com.*
+
+      - headers:
+          x-environment: 
+            exact: prod
+
+      rewrite:
+        uri: /
+
+      headers:
+        request:
+          set:
+            x-environment: prod
+
+      route:
+        - destination:
+            host: thermometer
+            subset: prod

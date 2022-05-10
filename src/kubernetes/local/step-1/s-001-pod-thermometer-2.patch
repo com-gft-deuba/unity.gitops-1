@@ -1,0 +1,23 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: thermometer-v2
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: thermometer
+    version: 2.0.0
+spec:
+  containers:
+    - name: thermometer
+      image: com.gft.deuba.unity.gitops-1.application.ms-measure:v2
+      imagePullPolicy: Never
+      args: [ "--type", "thermometer", "--address", "01:00", "--name", "thermometer-2", "--randomsvc", "http://random/random" ]
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+

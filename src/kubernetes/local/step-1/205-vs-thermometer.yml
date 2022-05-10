@@ -1,0 +1,33 @@
+##############################################################################
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: thermometer-ingress-api
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: thermometer
+    version: "1.0.0"
+
+spec:
+
+  http:
+
+# ----------------------------------------------------------------------------
+
+    - name: thermometer-prod
+
+      match:
+
+      - uri:
+          prefix: /thermometer/
+
+      rewrite:
+        uri: /
+
+      route:
+        - destination:
+            host: thermometer
+

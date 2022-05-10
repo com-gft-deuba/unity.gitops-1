@@ -1,0 +1,23 @@
+##############################################################################
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gitea-v1
+  namespace: com-gft-deuba-unity-gitops-1
+  labels:
+    PROJECT: com.gft.deuba.unity.gitops-1
+    app: gitea
+    version: "1.0.0"
+    
+spec:
+
+  containers:
+    - name: gitea-1
+      image: com.gft.deuba.unity.gitops-1.infrastructure.gitea:v1
+      imagePullPolicy: Never
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "500m"

@@ -1,0 +1,9 @@
+[submodule "src/go/ms-measure"]
+	path = src/go/ms-measure
+	url = git@github.com:com-gft-tsbo-source/go-ms-measure
+[submodule "src/go/ms-random"]
+	path = src/go/ms-random
+	url = git@github.com:com-gft-tsbo-source/go-ms-random
+[submodule "src/angular/fe-weatherstation"]
+	path = src/angular/fe-weatherstation
+	url = git@github.com:com-gft-tsbo-source/angular-fe-weatherstation
